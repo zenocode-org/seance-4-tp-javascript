@@ -33,7 +33,67 @@
   </p>
 
 <script>
-/* Écris tout ton JavaScript ici en suivant les étapes du README.md (même dossier). */
+  const start = document.querySelector("#demarrer");
+  const btn = document.querySelector("#clic");
+  const timeEl = document.querySelector("#temps");
+  const scoreEl = document.querySelector("#score");
+
+  let time = 10;
+  let score = 0;
+  let timer = null;
+  let running = false;
+
+  // --- ÉTAPE 3 : Gestion du bouton "Démarrer" ---
+  start.addEventListener("click", function () {
+    // 3.1 — Sécurité : on vérifie si une partie est déjà lancée
+    if (running) {
+      console.log("Une partie est déjà en cours !");
+      return; // On arrête la fonction ici
+    }
+
+    // 3.2 — Initialisation de la partie
+    running = true;
+    time = 10;
+    score = 0;
+
+    // Mise à jour de l'affichage (le texte sur la page)
+    timeEl.textContent = String(time);
+    scoreEl.textContent = String(score);
+
+    // État des boutons
+    btn.disabled = false;  // On active le bouton de clic
+    start.disabled = true; // On grise le bouton démarrer
+
+    // 3.3 — Le Minuteur (Lancement du compte à rebours)
+    timer = setInterval(function () {
+      time = time - 1; // On retire une seconde en mémoire
+      timeEl.textContent = String(time); // On l'affiche
+
+      // Condition de fin de partie
+      if (time === 0) {
+        // ARRÊT DU CHRONO : on utilise l'identifiant stocké dans 'timer'
+        clearInterval(timer); 
+        
+        // Remise à l'état initial pour pouvoir rejouer
+        btn.disabled = true;
+        start.disabled = false;
+        running = false;
+        
+        console.log("Fin de la partie !");
+      }
+    }, 1000); // 1000ms = 1 seconde
+  });
+
+  // --- ÉTAPE 4 : Clic sur le bouton de jeu ---
+  btn.addEventListener("click", function () {
+    // On n'augmente le score que si la partie est en cours
+    if (running) {
+      score = score + 1;
+      scoreEl.textContent = String(score);
+    }
+  });
+
 </script>
 </body>
 </html>
+
