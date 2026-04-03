@@ -34,9 +34,9 @@
 
 <script>
 /* À toi : corrige les sélecteurs (#grille, #start, #score). */
-const grid = document.querySelector('#plateau');
-const start = document.querySelector('#go');
-const scoreEl = document.querySelector('#points');
+const grid = document.querySelector('#grille');
+const start = document.querySelector('#start');
+const scoreEl = document.querySelector('#score');
 
 let cells = [];
 let score = 0;
@@ -44,10 +44,28 @@ let active = -1;
 let loop = null;
 let finPartie = null;
 
+
 function build() {
-  /* À toi : vider la grille, créer 9 div.case, les ajouter à grid et à cells.
-     Chaque case : au clic, si c’est la case active (taupe), +1 au score, retirer la classe taupe, remettre active à -1.
-     Indice : utilise let dans la boucle for, pas var, pour l’indice de case. */
+  grid.innerHTML = '';
+  cells = [] ;  
+  for (let i = 0; i < 9; i++) { 
+    let uneCase = document.createElement('div');
+    uneCase.classList.add('case');
+    grid.appendChild(uneCase);
+    cells.push(uneCase);
+    uneCase.addEventListener('click', function() {
+  // Le code ici s'exécutera seulement quand on clique sur CETTE case précise
+      if(i === active && active !== -1){
+        score = score + 1;             // N'oublie pas d'augmenter le score !
+        scoreEl.textContent = score;
+        uneCase.classList.remove('taupe');
+        active = -1;
+      }
+  });
+  
+    
+
+  }
 }
 
 build();
@@ -55,6 +73,46 @@ build();
 start.addEventListener('click', function () {
   /* Étape 4 du README (4.1 → 4.4) : questions d’exploration puis blocs à compléter /
      corrige le bug — reset, setInterval, setTimeout ~10 s. loop et finPartie déjà déclarées. */
+  if (loop !== null) {
+    clearInterval(loop);
+    loop = null; // Bonne pratique : on remet à null après avoir nettoyé
+  }
+
+  // On arrête la fin de partie programmée s'il existe
+  if (finPartie !== null) {
+    clearTimeout(finPartie);
+    finPartie = null;
+  }
+  scoreEl.textContent = 0;
+  score = 0;
+  if (active !== -1 && cells[active]) {
+    cells[active].classList.remove('taupe'); // On retire la couleur orange
+  }
+
+  // On remet l'indicateur à "aucune case"
+  active = -1;
+  loop = setInterval(function() {
+    // 1. Retirer la taupe de la case précédente (si elle existe)
+    if (active !== -1) {
+      cells[active].classList.remove('taupe');
+    }
+
+    // 2. Choisir une nouvelle case au hasard (0 à 8)
+    active = Math.floor(Math.random() * cells.length);
+
+    // 3. Ajouter la classe 'taupe' à la nouvelle case
+    cells[active].classList.add('taupe');
+  }, 700);
+  finPartie = setTimeout(function() {
+    clearInterval(loop); // On arrête le chrono de mouvement
+    alert("Temps écoulé ! Votre score : " + score);
+    
+    // Petit bonus : on cache la dernière taupe
+    if (active !== -1) {
+        cells[active].classList.remove('taupe');
+        active = -1;
+    }
+  }, 10000);
 });
 </script>
 </body>

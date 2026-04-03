@@ -1,39 +1,109 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>TP 1 — Compteur de clics (10 s)</title>
-<style>
-  *, *::before, *::after { box-sizing: border-box; }
-  body {
-    margin: 0 auto;
-    min-height: 100vh;
-    max-width: 40rem;
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: system-ui, sans-serif;
-    text-align: center;
-  }
-  button { padding: 0.4rem 0.75rem; cursor: pointer; }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TP 1 — Compteur de clics (10 s)</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0 auto;
+      min-height: 100vh;
+      max-width: 40rem;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, sans-serif;
+      text-align: center;
+    }
+    button { padding: 0.4rem 0.75rem; cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    #score-display { margin-top: 1rem; font-size: 1.2rem; }
+  </style>
 </head>
 <body>
+
   <h1>Mini-jeu : clics en 10 secondes</h1>
-  <p>Suis les étapes dans <strong>README.md</strong> (même dossier) et complète le script ci-dessous.</p>
+  <p>Clique sur "Démarrer" puis mitraille le bouton "Clique ici !"</p>
+  
   <p>
     <button type="button" id="demarrer">Démarrer</button>
     <button type="button" id="clic" disabled>Clique ici !</button>
-    <span>Temps : <span id="temps">10</span> s</span>
-    <strong>Score : <span id="score">0</span></strong>
+  </p>
+
+  <p>
+    <span>Temps restant : <span id="temps">10</span> s</span><br>
+    <strong id="score-display">Score : <span id="score">0</span></strong>
   </p>
 
 <script>
-/* Écris tout ton JavaScript ici en suivant les étapes du README.md (même dossier). */
+  /* --- ÉTAPE 1 : Références vers les nœuds --- */
+  const start = document.querySelector("#demarrer");
+  const btn = document.querySelector("#clic");
+  const timeEl = document.querySelector("#temps");
+  const scoreEl = document.querySelector("#score");
+
+  /* --- ÉTAPE 2 : Variables d’état --- */
+  let time = 10;
+  let score = 0;
+  let timer = null;
+  let running = false;
+
+  /* --- ÉTAPE 3 : Gestion du bouton "Démarrer" --- */
+  start.addEventListener("click", function () {
+    
+    // 3.1 — Sécurité contre les doubles lancements
+    if (running) {
+      console.log("Une partie est déjà en cours !");
+      return; 
+    }
+
+    // 3.2 — Initialisation de la partie
+    console.log("Partie démarrée !");
+    running = true;
+    time = 10;
+    score = 0;
+
+    // Mise à jour de l'affichage initial
+    timeEl.textContent = String(time);
+    scoreEl.textContent = String(score);
+
+    // Gestion des états des boutons
+    btn.disabled = false;  
+    start.disabled = true; 
+
+    // 3.3 — Le Minuteur
+    timer = setInterval(function () {
+      time = time - 1; 
+      timeEl.textContent = String(time);
+
+      // Condition de fin de partie
+      if (time === 0) {
+        // IMPORTANT : On arrête le minuteur pour éviter qu'il ne tourne à l'infini
+        clearInterval(timer); 
+        
+        // Remise à l'état initial
+        running = false;
+        btn.disabled = true;
+        start.disabled = false;
+        
+        console.log("Fin de la partie ! Score final : " + score);
+        alert("Temps écoulé ! Votre score : " + score);
+      }
+    }, 1000); 
+  });
+
+  /* --- ÉTAPE 4 : Clic sur le bouton de jeu --- */
+  btn.addEventListener("click", function () {
+    // On vérifie si la partie est bien active (sécurité supplémentaire)
+    if (running) {
+      score = score + 1;
+      scoreEl.textContent = String(score);
+    }
+  });
+
 </script>
 </body>
 </html>
